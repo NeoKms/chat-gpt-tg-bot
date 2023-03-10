@@ -1,3 +1,4 @@
 npm i pm2 -g
+cd /var/www/app/
 npm i
-pm2-runtime start /var/www/app/app_bot.config.js
+pm2-runtime start app_bot.config.js
