@@ -1,0 +1,5 @@
+node_modules/
+.env
+logs.txt
+.idea/
+tgdata/
