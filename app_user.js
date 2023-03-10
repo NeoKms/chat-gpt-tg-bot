@@ -25,14 +25,10 @@ const sendReq = async (text, data) => {
     frequency_penalty: 1,
     presence_penalty: 1,
     messages: [
-      {
-        role: "system",
-        content: "привет.",
-      },
-      {
-        role: "assistant",
-        content: "перефразируй текст",
-      },
+      // {
+      //   role: "system",
+      //   content: "",
+      // },
       { role: "user", content: text },
     ],
     stream: true,
