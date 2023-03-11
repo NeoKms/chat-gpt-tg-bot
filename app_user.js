@@ -41,6 +41,23 @@ chatBot.getBot().updates.on("updateShortMessage", async (msg) => {
 });
 
 const sendReq = async (text, data) => {
+  const splitted = text.split("/system/");
+  const messages = [];
+  if (splitted.length === 2) {
+    messages.push(
+      {role: "system", content: splitted[0].trim()},
+      {role: "user", content: splitted[1].trim()},
+    );
+  } else {
+    if (chatIdSystems[data.chatId]) {
+      messages.push(
+        {role: "system", content: chatIdSystems[data.chatId]},
+      );
+    }
+    messages.push(
+      {role: "user", content: splitted[0].trim()},
+    );
+  }
   const body = {
     model: "gpt-3.5-turbo",
     temperature: 0,
