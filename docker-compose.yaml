@@ -3,15 +3,17 @@ version: "3.3"
 services:
   openaibot:
     container_name: openaibot
-    image: node:latest
+    image: node:18
     restart: always
     environment:
-      - BOT_TOKEN=0000
-      - OPEN_AI_TOKEN=0000
-
+      - OPEN_AI_TOKEN=000
+      # for bot
+      - BOT_TOKEN=000
+      # for user
       - API_ID=000
       - API_HASH=000
       - PHONE=000
-    command: sh /var/www/app/init.sh
+    command: sh /var/www/app/init_bot.sh
+#    command: sh /var/www/app/init_user.sh
     volumes:
       - "./:/var/www/app"

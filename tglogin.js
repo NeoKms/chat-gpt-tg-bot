@@ -1,24 +1,20 @@
-const {TG} = require('./src/config');
+const prompt = require("prompt");
+process.env.MTPROTO_LOG_ALL = "false";
+const UserAPIWrapper = new (require("./src/module/UserAPIWrapper"))();
 
-const prompt = require('prompt');
-const tg = require('./src/helpers/tg');
-
-//
-async function get() {
-    prompt.start();
-    return (await prompt.get([{ name: 'code' }])).code;
-}
-//
-tg.checkLogin().then(async(r)=>{
-    console.log('TG logged');
-}).catch(e => {
-    return tg.sendCode(TG.phone).then(async (res)=>{
-        console.log("res",res);
-        const b = await get(); prompt.stop();
-        await tg.signIn(b, TG.phone, res.phone_code_hash);
-        console.log('Login OK');
-    }).catch(e => {
-        console.error('Error', e);
-    });
-})
-    // .finally(()=>process.exit());
+UserAPIWrapper.checkLogin()
+  .then(async ()=>{
+    console.log("TG logged");
+  })
+  .catch(()=>
+    UserAPIWrapper.sendCode()
+      .then(async res=>{
+        prompt.start();
+        const promptObj = await prompt.get([{name: "code"}]);
+        prompt.stop();
+        await UserAPIWrapper.signIn(promptObj.code, res.phone_code_hash);
+        console.log("Login OK");
+      })
+      .catch(err=>console.log("Login error", err))
+  )
+  .finally(()=>process.exit());

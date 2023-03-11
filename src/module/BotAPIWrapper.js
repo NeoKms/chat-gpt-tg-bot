@@ -1,58 +1,61 @@
-const { sleep,splitToChunks } = require("../helpers/helpers");
-const API = require('./mtproto');
+const TelegramBot = require("node-telegram-bot-api");
+const {sleep} = require("../helpers/helpers");
 
-module.exports = new class BotAPIWrapper {
-    canEdit = true;
-    oldMessagesWasEdited = [];
+module.exports = class BotAPIWrapper {
+  bot = null;
+  canEdit = true;
 
-    constructor(token) {}
+  constructor(token) {
+    this.bot = new TelegramBot(token, {polling: true});
+  }
 
-    getBot() {
-        return API.mtproto;
-    }
+  getBot() {
+    return this.bot;
+  }
 
-    async sendMessage(chatId,text) {
-        const chunks = splitToChunks(text, 4000);
-        let res = null;
-        for (let i = 0; i<chunks.length;i++) {
-            res = await this.#sendMessage(chatId, chunks[i]);
+  async sendMessage(chatId, text) {
+    return this.bot
+      .sendMessage(chatId, text)
+      .then((result) => ({message: "ok", result}))
+      .catch((err) => {
+        if (
+          err?.response?.body?.description?.indexOf("Too Many Requests") !== -1
+        ) {
+          return sleep(err.response.body.retry_after * 1000).then(() =>
+            this.sendMessage(chatId, text),
+          );
+        } else {
+          return {message: "error", error: err.message};
         }
-        return res;
-    }
-    async #sendMessage(chatId, text) {
-        return API.call('messages.sendMessage',{
-            message: text,
-            random_id: Math.floor((Math.random()*100000000)+1),
-            peer: {
-                _: 'inputPeerUser',
-                user_id: chatId,
-            },
-        });
-    }
+      });
+  }
 
-    async editMessageTextImmediately(text, msgId, chatId, waitUnlim = false) {
-        return API.call("messages.editMessage",{
-            message: text,
-            id: msgId,
-            peer: {
-                _: 'inputPeerUser',
-                user_id: chatId,
-            },
-        })
-            .then(res=>{
-                if (res?.error_message?.indexOf("FLOOD_WAIT")>=0) {
-                    const sec = res.error_message.split("_")[2];
-                    return sleep(sec*1000)
-                        .then(()=>this.editMessageTextImmediately(text,msgId,chatId,true));
-                }
-            })
-    }
-
-    async editMessageText(text, msgId, chatId) {
-        if (this.canEdit) {
-            this.canEdit = false;
-            setTimeout(() => (this.canEdit = true), 10000);
-            return this.editMessageTextImmediately(text, msgId, chatId);
+  async editMessageTextImmediately(text, msgId, chatId, waitUnlim = false) {
+    return this.bot
+      .editMessageText(text, {
+        message_id: msgId,
+        chat_id: chatId,
+      })
+      .then((result) => ({message: "ok", result}))
+      .catch((err) => {
+        if (
+          waitUnlim &&
+                    err?.response?.body?.description?.indexOf("Too Many Requests") !== -1
+        ) {
+          return sleep(err.response.body.retry_after * 1000).then(() =>
+            this.editMessageText(text, msgId, chatId),
+          );
+        } else {
+          return {message: "error", error: err.message};
         }
+      });
+  }
+
+  async editMessageText(text, msgId, chatId) {
+    if (this.canEdit) {
+      this.canEdit = false;
+      setTimeout(() => (this.canEdit = true), 1000);
+      return this.editMessageTextImmediately(text, msgId, chatId);
     }
+  }
 };

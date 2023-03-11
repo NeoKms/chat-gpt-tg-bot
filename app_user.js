@@ -1,19 +1,43 @@
-const { fetchSSE, splitToChunks, sleep} = require("./src/helpers/helpers");
-const redis = require("./src/module/redis")
+const {fetchSSE, splitToChunks, sleep, addLog, getChatIdSystems, setChatIdSystems} = require("./src/helpers/helpers");
 const config = require("./src/config");
 
-const chatBot = require("./src/module/BotAPIWrapper");
+const chatBot = new (require("./src/module/UserAPIWrapper"))();
 
-const messagesInProgress = {};
-chatBot.getBot().updates.on('updateShortMessage', async (updateInfo) => {
-  console.log('updateShortMessage:', updateInfo);
-  messagesInProgress[updateInfo.user_id] = true;
-  const data = { allText: "", messageId: 0, chatId: updateInfo.user_id, chunk: 0 };
-  await chatBot.sendMessage(data.chatId, "Ожидайте ответа. Обновление происходит раз в 10 секунд.");
-  await sendReq(updateInfo.message, data);
-  console.log(data);
-  await chatBot.sendMessage(data.chatId, "Ответ закончен.");
-  messagesInProgress[updateInfo.user_id] = false;
+const inProgress = new Set();
+const chatIdSystems = getChatIdSystems();
+
+chatBot.getBot().updates.on("updateShortMessage", async (msg) => {
+  if (!msg?.message?.length) return;
+  addLog(JSON.stringify(msg, null, 2));
+  if (inProgress.has(msg.user_id)) {
+    return chatBot.sendMessage(msg.user_id, "Подождите завершения предыдущего запроса");
+  }
+  inProgress.add(msg.user_id);
+  const isBotCommand = msg.message[0] === "/";
+  if (!isBotCommand) {
+    const data = {
+      allText: "Ожидайте ответа. Обновление происходит раз в 10 секунд.\n\n",
+      messageId: 0,
+      chatId: msg.user_id,
+      chunk: 0
+    };
+    await sendReq(msg.message, data);
+    addLog(`Ответ на ${msg.user_id}-${msg.id}:\n${data.allText}`);
+  } else {
+    const command = msg.message.split(" ")[0].trim();
+    const text = msg.message.replace(command,"").trim();
+    if (command==="/system") {
+      chatIdSystems[msg.user_id] = text;
+      setChatIdSystems(chatIdSystems);
+      chatBot.sendMessage(msg.user_id, "Поведение установлено");
+    } else if (command==="/help") {
+      chatBot.sendMessage(msg.user_id, "Можно задовать поведение бота через команду \n" +
+          "/system текст поведения\n" +
+          "Например можно установить, чтобы он переводил текст:\n" +
+          "/system Ты помощник в переводе текста с русского на японский");
+    }
+  }
+  inProgress.delete(msg.user_id);
 });
 
 const sendReq = async (text, data) => {
@@ -25,11 +49,7 @@ const sendReq = async (text, data) => {
     frequency_penalty: 1,
     presence_penalty: 1,
     messages: [
-      // {
-      //   role: "system",
-      //   content: "",
-      // },
-      { role: "user", content: text },
+      {role: "user", content: text},
     ],
     stream: true,
   };
@@ -39,7 +59,7 @@ const sendReq = async (text, data) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${config.OPEN_AI_TOKEN}`,
+      "Authorization": `Bearer ${config.OPEN_AI_TOKEN}`,
     },
     body: JSON.stringify(body),
     onMessage: async (msg) => {
@@ -47,22 +67,20 @@ const sendReq = async (text, data) => {
       try {
         resp = JSON.parse(msg);
       } catch {
-        console.log("err");
         return;
       }
-      const { choices } = resp;
+      const {choices} = resp;
       if (!choices || choices.length === 0) {
-        return { error: "No result" };
+        return {error: "No result"};
       }
-      const { delta, finish_reason: finishReason } = choices[0];
+      const {delta, finish_reason: finishReason} = choices[0];
       if (finishReason) {
-        console.log("finishReason", finishReason);
         return;
       }
-      const { content = "", role } = delta;
+      const {content = "", role} = delta;
       let targetTxt = content;
 
-      if (isFirst && targetTxt && ["“", '"', "「"].indexOf(targetTxt[0]) >= 0) {
+      if (isFirst && targetTxt && ["“", "\"", "「"].indexOf(targetTxt[0]) >= 0) {
         targetTxt = targetTxt.slice(1);
       }
 
@@ -76,7 +94,7 @@ const sendReq = async (text, data) => {
         msgSended = true;
         const res = await chatBot.sendMessage(
           data.chatId,
-          data.allText
+          data.allText,
         );
         data.messageId = res.id;
       } else if (data.allText.length && data.messageId > 0) {
@@ -84,17 +102,17 @@ const sendReq = async (text, data) => {
         let nowText = chunks[data.chunk];
         if (nowText.length===4000 && chunks.length>data.chunk+1 && chunks[data.chunk+1].length) {
           chatBot.editMessageTextImmediately(
-              nowText,
-              data.messageId,
-              data.chatId,
-              true
+            nowText,
+            data.messageId,
+            data.chatId,
+            true,
           );
           data.messageId = 0;
           data.chunk++;
           nowText = chunks[data.chunk];
           const res = await chatBot.sendMessage(
-              data.chatId,
-              nowText
+            data.chatId,
+            nowText,
           );
           data.messageId = res.id;
         } else {
@@ -103,19 +121,21 @@ const sendReq = async (text, data) => {
       }
     },
     onError: (err) => {
-      const { error } = err;
+      const {error} = err;
       console.log("on error", error.message);
     },
   });
+  data.allText += "\n\nОтвет закончен.";
+  data.allText = data.allText.replace("Ожидайте ответа. Обновление происходит раз в 10 секунд.\n\n","");
   const chunks = splitToChunks(data.allText, 4000);
-  let nowText = chunks[data.chunk];
-  if (!data.messageId) {
-    await sleep(4000);
+  const nowText = chunks[data.chunk];
+  while (!data.messageId) {
+    await sleep(1000);
   }
   await chatBot.editMessageTextImmediately(
-      nowText,
-      data.messageId,
-      data.chatId,
-      true
+    nowText,
+    data.messageId,
+    data.chatId,
+    true,
   );
 };
