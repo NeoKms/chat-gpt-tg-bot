@@ -1,11 +1,10 @@
-const {fetchSSE, splitToChunks, sleep, addLog, getChatIdSystems, setChatIdSystems} = require("./src/helpers/helpers");
+const {fetchSSE, splitToChunks, sleep, addLog, getDB, setDB} = require("./src/helpers/helpers");
 const config = require("./src/config");
 
 const chatBot = new (require("./src/module/UserAPIWrapper"))();
 
 const inProgress = new Set();
-const chatIdSystems = getChatIdSystems();
-
+const db = getDB();
 chatBot.getBot().updates.on("updateShortMessage", async (msg) => {
   if (!msg?.message?.length) return;
   addLog(JSON.stringify(msg, null, 2));
@@ -22,19 +21,35 @@ chatBot.getBot().updates.on("updateShortMessage", async (msg) => {
       chunk: 0
     };
     await sendReq(msg.message, data);
+    if (msg.message.indexOf("/system/")===-1) {
+      if (!db.history.hasOwnProperty(msg.user_id)) {
+        db.history[msg.user_id] = [];
+      }
+      db.history[msg.user_id].push({role: "user", content: msg.message});
+      db.history[msg.user_id].push({role: "assistant", content: data.allText});
+      setDB(db);
+    }
     addLog(`Ответ на ${msg.user_id}-${msg.id}:\n${data.allText}`);
   } else {
     const command = msg.message.split(" ")[0].trim();
-    const text = msg.message.replace(command,"").trim();
-    if (command==="/system") {
-      chatIdSystems[msg.user_id] = text;
-      setChatIdSystems(chatIdSystems);
+    const text = msg.message.replace(command, "").trim();
+    if (command === "/system") {
+      db.chatIdSystems[msg.user_id] = text;
+      setDB(db);
       chatBot.sendMessage(msg.user_id, "Поведение установлено");
-    } else if (command==="/help") {
+    } else if (command === "/help") {
       chatBot.sendMessage(msg.user_id, "Можно задовать поведение бота через команду \n" +
-          "/system текст поведения\n" +
-          "Например можно установить, чтобы он переводил текст:\n" +
-          "/system Ты помощник в переводе текста с русского на японский");
+                "/system текст поведения\n" +
+                "Например можно установить, чтобы он переводил текст:\n" +
+                "/system Ты помощник в переводе текста с русского на японский");
+    } else if (command === "/history") {
+      db.historyMode[msg.user_id] = !db.historyMode[msg.user_id];
+      setDB(db);
+      chatBot.sendMessage(msg.user_id, "Отслеживание истории" + (db.historyMode[msg.user_id] ? " включено" : " отключено"));
+    } else if (command==="/clear_history") {
+      db.history[msg.user_id] = [];
+      chatBot.sendMessage(msg.user_id, "История очищена");
+      setDB(db);
     }
   }
   inProgress.delete(msg.user_id);
@@ -46,18 +61,15 @@ const sendReq = async (text, data) => {
   if (splitted.length === 2) {
     messages.push(
       {role: "system", content: splitted[0].trim()},
-      {role: "user", content: splitted[1].trim()},
     );
-  } else {
-    if (chatIdSystems[data.chatId]) {
-      messages.push(
-        {role: "system", content: chatIdSystems[data.chatId]},
-      );
-    }
-    messages.push(
-      {role: "user", content: splitted[0].trim()},
-    );
+  } else if (db.chatIdSystems[data.chatId]) {
+    messages.push({role: "system", content: db.chatIdSystems[data.chatId]});
   }
+  if (db.historyMode[data.chatId] && db.history[data.chatId]?.length) {
+    messages.push(...db.history[data.chatId]);
+  }
+  messages.push({role: "user", content: splitted[0].trim()});
+  console.log(messages);
   const body = {
     model: "gpt-3.5-turbo",
     temperature: 0,
@@ -87,6 +99,7 @@ const sendReq = async (text, data) => {
         return;
       }
       const {choices} = resp;
+
       if (!choices || choices.length === 0) {
         return {error: "No result"};
       }
@@ -117,7 +130,7 @@ const sendReq = async (text, data) => {
       } else if (data.allText.length && data.messageId > 0) {
         const chunks = splitToChunks(data.allText, 4000);
         let nowText = chunks[data.chunk];
-        if (nowText.length===4000 && chunks.length>data.chunk+1 && chunks[data.chunk+1].length) {
+        if (nowText.length === 4000 && chunks.length > data.chunk + 1 && chunks[data.chunk + 1].length) {
           chatBot.editMessageTextImmediately(
             nowText,
             data.messageId,
@@ -143,7 +156,7 @@ const sendReq = async (text, data) => {
     },
   });
   data.allText += "\n\nОтвет закончен.";
-  data.allText = data.allText.replace("Ожидайте ответа. Обновление происходит раз в 10 секунд.\n\n","");
+  data.allText = data.allText.replace("Ожидайте ответа. Обновление происходит раз в 10 секунд.\n\n", "");
   const chunks = splitToChunks(data.allText, 4000);
   const nowText = chunks[data.chunk];
   while (!data.messageId) {
@@ -155,4 +168,5 @@ const sendReq = async (text, data) => {
     data.chatId,
     true,
   );
+  data.allText = data.allText.replace("\n\nОтвет закончен.","");
 };

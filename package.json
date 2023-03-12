@@ -8,7 +8,7 @@
     "start:bot": "node app_bot.js",
     "start:user": "node app_user.js",
     "dev:bot": "nodemon app_bot.js",
-    "dev:user": "node app_user.js",
+    "dev:user": "nodemon app_user.js",
     "prepare": "husky install"
   },
   "author": "Zhigulskiy Vladislav",

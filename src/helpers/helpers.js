@@ -113,17 +113,17 @@ helpers.addLog = (text) => {
   fs.appendFile("logs.txt", `[${helpers.formatDateJS((new Date() / 1000) + 3600 * 3, "DD.MM.YYYY hh:mm:ss")}]\n${text}\n`)
     .catch((err) => console.log("error in helpers.addLog", err.message));
 };
-helpers.getChatIdSystems = () => {
+helpers.getDB = () => {
   try {
-    return JSON.parse(fsSync.readFileSync("./ChatIdSystems.txt", "utf-8") || {});
+    return JSON.parse(fsSync.readFileSync("./db.json", "utf-8") || {});
   } catch (err) {
     if (err.message.indexOf("no such file")!==-1) {
       return {};
     }
   }
 };
-helpers.setChatIdSystems = (data) => {
-  return fsSync.writeFileSync("./ChatIdSystems.txt",JSON.stringify(data,null,2));
+helpers.setDB = (data) => {
+  return fsSync.writeFileSync("./db.json",JSON.stringify(data,null,2));
 };
 
 module.exports = helpers;
