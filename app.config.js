@@ -3,10 +3,10 @@ module.exports = {
     {
       error_file: "/var/log/pm2_err.log",
       out_file: "/var/log/pm2_out.log",
-      name: "app_user",
+      name: "app",
       script: "npm",
       watch: false,
-      args: "run start:user",
+      args: "run start:app",
       cwd: "/var/www/app",
     },
   ],

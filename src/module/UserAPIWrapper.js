@@ -1,12 +1,12 @@
 const {sleep, splitToChunks} = require("../helpers/helpers");
 const API = require("./mtproto");
-const {TG} = require("../config");
+const {TG, TIMEOUT_MSG_EDIT} = require("../config");
 
 module.exports = class UserAPIWrapper {
   canEdit = true;
 
   getBot() {
-    return API.mtproto;
+    return API.mtproto.updates;
   }
 
   sendCode() {
@@ -34,9 +34,11 @@ module.exports = class UserAPIWrapper {
 
   async sendMessage(chatId, text) {
     const chunks = splitToChunks(text, 4000);
-    let res = null;
+    const res = {id: null, arr: []};
     for (let i = 0; i<chunks.length; i++) {
-      res = await this.#sendMessage(chatId, chunks[i]);
+      const msg = await this.#sendMessage(chatId, chunks[i]);
+      res.arr.push(msg);
+      res.id = msg.id;
     }
     return res;
   }
@@ -72,7 +74,7 @@ module.exports = class UserAPIWrapper {
   async editMessageText(text, msgId, chatId) {
     if (this.canEdit) {
       this.canEdit = false;
-      setTimeout(() => (this.canEdit = true), 10000);
+      setTimeout(() => (this.canEdit = true), TIMEOUT_MSG_EDIT);
       return this.editMessageTextImmediately(text, msgId, chatId);
     }
   }

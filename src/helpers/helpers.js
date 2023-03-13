@@ -113,17 +113,33 @@ helpers.addLog = (text) => {
   fs.appendFile("logs.txt", `[${helpers.formatDateJS((new Date() / 1000) + 3600 * 3, "DD.MM.YYYY hh:mm:ss")}]\n${text}\n`)
     .catch((err) => console.log("error in helpers.addLog", err.message));
 };
-helpers.getChatIdSystems = () => {
+helpers.getDB = () => {
   try {
-    return JSON.parse(fsSync.readFileSync("./ChatIdSystems.txt", "utf-8") || {});
+    return JSON.parse(fsSync.readFileSync("./db.json", "utf-8") || {});
   } catch (err) {
-    if (err.message.indexOf("no such file")!==-1) {
-      return {};
+    if (err.message.indexOf("no such file") !== -1) {
+      return {chatIdSystems: {}, history: {}, historyMode: {}};
     }
   }
 };
-helpers.setChatIdSystems = (data) => {
-  return fsSync.writeFileSync("./ChatIdSystems.txt",JSON.stringify(data,null,2));
+helpers.saveDB = (data) => {
+  return fsSync.writeFileSync("./db.json", JSON.stringify(data, null, 2));
 };
 
+helpers.prepareBotMsgToLog = (msg) => {
+  const msgToLog = JSON.parse(JSON.stringify(msg));
+  delete msgToLog.chat;
+  msgToLog.from.chat_id = msg.chat.id;
+  return msgToLog;
+};
+
+helpers.prepareMessage = (msg) => {
+  const isBotMsg = msg?.chat?.id ?? false;
+  return isBotMsg ? {
+    message: msg.text,
+    user_id: msg.chat.id,
+    id: msg.message_id,
+    from: msg.from,
+  } : msg;
+};
 module.exports = helpers;

@@ -1,14 +1,12 @@
 {
-  "name": "openai",
+  "name": "chat-gpt-tg-bot",
   "version": "1.0.0",
   "description": "chat-gpt-tg-bot",
-  "main": "app_bot.js",
+  "main": "app.js",
   "scripts": {
     "eslint-fix": "eslint --fix .",
-    "start:bot": "node app_bot.js",
-    "start:user": "node app_user.js",
-    "dev:bot": "nodemon app_bot.js",
-    "dev:user": "node app_user.js",
+    "start:app": "node app.js",
+    "dev:app": "nodemon app.js",
     "prepare": "husky install"
   },
   "author": "Zhigulskiy Vladislav",

@@ -21,4 +21,9 @@ config.REDIS_SETTINGS = {
   host: env.REDIS_HOST,
   port: parseInt(env.REDIS_PORT),
 };
+
+config.IS_BOT = !!config.BOT_TOKEN;
+
+config.TIMEOUT_MSG_EDIT = parseInt(env.TIMEOUT_MSG_EDIT ?? 10000);
+
 module.exports = config;
