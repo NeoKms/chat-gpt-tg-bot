@@ -1,9 +1,11 @@
 const {getDB, saveDB} = require("../helpers/helpers");
+const i18n = require("../i18n");
 const dbData = getDB();
+
 
 module.exports = class DB {
   constructor(uid) {
-    if (!uid) throw new Error("Не передан ID пользователя");
+    if (!uid) throw new Error(i18n.t("errors.user_id_not_found"));
     this.uid = uid;
   }
 

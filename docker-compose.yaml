@@ -6,6 +6,7 @@ services:
     image: node:18
     restart: always
     environment:
+      - APP_LOCALE=ru
       - TIMEOUT_MSG_EDIT=10000
       - OPEN_AI_TOKEN=
       # for bot

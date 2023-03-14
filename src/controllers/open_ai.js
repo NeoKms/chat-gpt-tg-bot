@@ -1,12 +1,12 @@
 const {fetchSSE, splitToChunks, sleep} = require("../helpers/helpers");
 const config = require("../config");
-const {defaultTexts} = require("../helpers/constants");
+const i18n = require("../i18n");
 
 const open_ai = {};
 
 open_ai.sendReq = async function (text, data, db) {
   if (!["UserAPIWrapper","BotAPIWrapper"].includes(this?.constructor?.name)) {
-    throw new Error("Не был установлен APIWrapper .bind()");
+    throw new Error(i18n.t("errors.api_bind"));
   }
   const splitted = text.split("/system/");
   const messages = [];
@@ -101,8 +101,8 @@ open_ai.sendReq = async function (text, data, db) {
       console.log("on error", error.message);
     },
   });
-  data.allText += defaultTexts.end;
-  data.allText = data.allText.replace(defaultTexts.start, "");
+  data.allText += i18n.t("messages.end_ai");
+  data.allText = data.allText.replace(i18n.t("messages.start_ai",{time: config.TIMEOUT_MSG_EDIT/1000}), "");
   const chunks = splitToChunks(data.allText, 4000);
   const nowText = chunks[data.chunk];
   while (!data.messageId) {
@@ -114,6 +114,6 @@ open_ai.sendReq = async function (text, data, db) {
     data.chatId,
     true,
   );
-  data.allText = data.allText.replace(defaultTexts.end, "");
+  data.allText = data.allText.replace(i18n.t("messages.end_ai"), "");
 };
 module.exports = open_ai;
