@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/NeoKms/my-static/main/chatGPT.gif" width="800" >
+
 ## Приложение для запуска чат-бота для Telegram на основе ChatGPT 
 
 Может работать в двух режимах
