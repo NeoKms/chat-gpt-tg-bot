@@ -1,0 +1,22 @@
+{
+	"errors": {
+		"api_bind": "APIWrapper was not installed (.bind())",
+		"user_id_not_found": "User ID not passed",
+		"add_log": "Error adding log helpers.addLog"
+	},
+	"messages": {
+		"wait": "Wait for the previous request to complete",
+		"system_set": "Behavior set",
+		"help": "1. With the /system command, you can set the behavior of the bot.\n/system behavior text\nFor example, you can set it to translate text:\n/system You are an assistant in translating text from English into Japanese\n\n2. With the /history command, you can turn on the \"chat\" mode. In this mode, the bot will remember all messages and respond based on previous messages. Calling the command clears the history of messages stored in the database.\n\n3. With the /clear_history command, you can forcefully clear the message history stored in the database",
+		"history": "History tracking",
+		"history_clear": "History cleared",
+		"start_ai": "Expect a response. The update happens once every {{time}} seconds.\n\n",
+		"end_ai": "\n\nAnswer completed."
+	},
+	"logs": {
+		"answer": "Answer to"
+	},
+	"on": "enabled",
+	"off": "disabled",
+	"months_arr": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+}

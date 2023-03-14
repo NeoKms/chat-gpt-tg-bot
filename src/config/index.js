@@ -26,4 +26,6 @@ config.IS_BOT = !!config.BOT_TOKEN;
 
 config.TIMEOUT_MSG_EDIT = parseInt(env.TIMEOUT_MSG_EDIT ?? 10000);
 
+config.APP_LOCALE = env.APP_LOCALE ?? "ru";
+
 module.exports = config;

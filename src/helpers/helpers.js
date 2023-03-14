@@ -1,15 +1,15 @@
 const {createParser} = require("eventsource-parser");
 const fsSync = require("fs");
 const fs = fsSync.promises;
+const i18n = require("../i18n");
 
 const helpers = {};
 helpers.formatDateJS = (t, m) => {
   if (!m) m = "YYYY-MM-DD hh:mm:ss";
   const d = new Date(t * 1000);
-  const mmmm = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
   m = m.replace("YYYY", d.getUTCFullYear());
   m = m.replace("YY", (d.getUTCFullYear() % 100 > 9 ? "" : "0") + d.getUTCFullYear() % 100);
-  m = m.replace("MMMM", mmmm[d.getUTCMonth()]);
+  m = m.replace("MMMM", i18n.t[`months_arr.${d.getUTCMonth()}`]);
   m = m.replace("MM", ((d.getUTCMonth() + 1) > 9 ? "" : "0") + (d.getUTCMonth() + 1));
   m = m.replace("DD", (d.getUTCDate() > 9 ? "" : "0") + d.getUTCDate());
   m = m.replace("hh", (d.getUTCHours() > 9 ? "" : "0") + d.getUTCHours());
@@ -111,7 +111,7 @@ helpers.splitToChunks = (arr, n) => {
 };
 helpers.addLog = (text) => {
   fs.appendFile("logs.txt", `[${helpers.formatDateJS((new Date() / 1000) + 3600 * 3, "DD.MM.YYYY hh:mm:ss")}]\n${text}\n`)
-    .catch((err) => console.log("error in helpers.addLog", err.message));
+    .catch((err) => console.log(i18n.t("errors.add_log"), err.message));
 };
 helpers.getDB = () => {
   try {
