@@ -1,4 +1,3 @@
-# Русский
 ## Приложение для запуска чат-бота для Telegram на основе ChatGPT 
 
 Может работать в двух режимах
@@ -33,7 +32,6 @@
 1. TIMEOUT_MSG_EDIT - Время между обновлением (изменением сообщения) ответа в реальном времени. Маленькие значения могут приводить ко временной блокировки по флуду.
 2. APP_LOCALE - Язык приложения. Доступны en и ru.
 
-# English
 ## Application for launching a chat bot for Telegram based on ChatGPT
 
 Can work in two modes
