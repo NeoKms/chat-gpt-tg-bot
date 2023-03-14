@@ -39,7 +39,7 @@ module.exports = class BotAPIWrapper {
             this.sendMessage(chatId, text),
           );
         } else {
-          return {message: "error", error: err.message};
+          return {message: "error", error: err.message, id: -1};
         }
       });
   }

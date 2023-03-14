@@ -1,35 +1,16 @@
-const {sleep, splitToChunks} = require("../helpers/helpers");
+const {splitToChunks} = require("../helpers/helpers");
 const API = require("./mtproto");
-const {TG, TIMEOUT_MSG_EDIT} = require("../config");
+const {TIMEOUT_MSG_EDIT} = require("../config");
 
-module.exports = class UserAPIWrapper {
+module.exports = class UserAPIWrapper extends API {
   canEdit = true;
 
-  getBot() {
-    return API.mtproto.updates;
+  constructor() {
+    super();
   }
 
-  sendCode() {
-    return API.call("auth.sendCode", {
-      phone_number: TG.phone,
-      settings: {
-        _: "codeSettings",
-      },
-    });
-  }
-  signIn(code, phone_code_hash) {
-    return API.call("auth.signIn", {
-      phone_code: code,
-      phone_number: TG.phone,
-      phone_code_hash,
-    });
-  }
-  checkLogin() {
-    return API.call("users.getFullUser", {
-      id: {
-        _: "inputUserSelf",
-      },
-    });
+  getBot() {
+    return this.mtproto.updates;
   }
 
   async sendMessage(chatId, text) {
@@ -43,32 +24,28 @@ module.exports = class UserAPIWrapper {
     return res;
   }
   async #sendMessage(chatId, text) {
-    return API.call("messages.sendMessage", {
+    return this.call("messages.sendMessage", {
       message: text,
-      random_id: Math.floor((Math.random()*100000000)+1),
+      random_id: Math.floor((Math.random() * 100000000) + 1),
       peer: {
         _: "inputPeerUser",
         user_id: chatId,
       },
-    });
+    })
+      .catch((err) => ({id: -1, message: "error", error: err.message}));
   }
 
   async editMessageTextImmediately(text, msgId, chatId, waitUnlim = false) {
-    return API.call("messages.editMessage", {
+    return this.call("messages.editMessage", {
       message: text,
       id: msgId,
       peer: {
         _: "inputPeerUser",
         user_id: chatId,
       },
+      waitUnlim,
     })
-      .then((res)=>{
-        if (res?.error_message?.indexOf("FLOOD_WAIT")>=0 && waitUnlim) {
-          const sec = Number(res.error_message.split("FLOOD_WAIT_")[1]);
-          return sleep(sec*1000)
-            .then(()=>this.editMessageTextImmediately(text, msgId, chatId, true));
-        }
-      });
+      .catch((err) => ({id: -1, error: err.message}));
   }
 
   async editMessageText(text, msgId, chatId) {
