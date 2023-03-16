@@ -13,6 +13,29 @@ module.exports = class UserAPIWrapper extends API {
     return this.mtproto.updates;
   }
 
+  async cancelTyping(chatId) {
+    return this.call("messages.setTyping",{
+      action: {
+        _:"sendMessageCancelAction"
+      },
+      peer: {
+        _: "inputPeerUser",
+        user_id: chatId,
+      },
+    });
+  }
+  async setTyping(chatId) {
+    return this.call("messages.setTyping",{
+      action: {
+        _: "sendMessageTypingAction",
+      },
+      peer: {
+        _: "inputPeerUser",
+        user_id: chatId,
+      },
+    });
+  }
+
   async sendMessage(chatId, text) {
     const chunks = splitToChunks(text, 4000);
     const res = {id: null, arr: []};
