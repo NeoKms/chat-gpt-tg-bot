@@ -6,6 +6,7 @@ const open_ai = {};
 
 open_ai.sendReq = async function (text, data, db) {
   await this.setTyping(data.chatId).catch(()=>{});
+  const typingInterval = setInterval(()=>this.setTyping(data.chatId).catch(()=>{}), 5000);
   if (!["UserAPIWrapper","BotAPIWrapper"].includes(this?.constructor?.name)) {
     throw new Error(i18n.t("errors.api_bind"));
   }
@@ -95,7 +96,6 @@ open_ai.sendReq = async function (text, data, db) {
         } else {
           data.messageId && this.editMessageText(nowText, data.messageId, data.chatId);
         }
-        this.setTyping(data.chatId).catch(()=>{});
       }
     },
     onError: (err) => {
@@ -116,6 +116,7 @@ open_ai.sendReq = async function (text, data, db) {
     data.chatId,
     true,
   );
+  clearInterval(typingInterval);
   await this.cancelTyping(data.chatId).catch(()=>{});
   data.allText = data.allText.replace(i18n.t("messages.end_ai"), "");
 };
