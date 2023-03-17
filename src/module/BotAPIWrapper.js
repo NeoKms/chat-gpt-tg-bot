@@ -10,6 +10,13 @@ module.exports = class BotAPIWrapper {
     this.bot = new TelegramBot(BOT_TOKEN, {polling: true});
   }
 
+  async setTyping(chatId) {
+    return this.bot.sendChatAction(chatId,"typing");
+  }
+  async cancelTyping(chatId) {
+    return this.bot.sendChatAction(chatId,"cancel");
+  }
+
   getBot() {
     return this.bot;
   }
