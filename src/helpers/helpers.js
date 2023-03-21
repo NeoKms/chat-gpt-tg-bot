@@ -38,8 +38,7 @@ helpers.getUnixTime = (date, form) => {
     if (s >= 0 && s < 60 && m >= 0 && m < 60 && h >= 0 && h < 24 && D > 0 && D <= 31 && M > 0 && M <= 12) {
       if (Y > 2100) Y = 2100;
       const feb = IsLeapYear(Y) ? 29 : 28;
-      if ((M == 2 && D > feb) || (D > 30 && (M == 4 || M == 6 || M == 9 || M == 11))) return false;
-      // IsLeapYear(year)
+      if ((M === 2 && D > feb) || (D > 30 && (M === 4 || M === 6 || M === 9 || M === 11))) return false;
       format = Date.UTC(Y, M - 1, D, h, m, s) / 1000;
       return format;
     }
@@ -49,9 +48,9 @@ helpers.getUnixTime = (date, form) => {
 };
 
 function IsLeapYear(year) {
-  if (year % 4 == 0) {
-    if (year % 100 == 0) {
-      if (year % 400 == 0) {
+  if (year % 4 === 0) {
+    if (year % 100 === 0) {
+      if (year % 400 === 0) {
         return true;
       } else {
         return false;
