@@ -1,3 +1,4 @@
+[![Qodana](https://github.com/NeoKms/chat-gpt-tg-bot/actions/workflows/qodana.yml/badge.svg?branch=main)](https://github.com/NeoKms/chat-gpt-tg-bot/actions/workflows/qodana.yml)
 <img src="https://raw.githubusercontent.com/NeoKms/my-static/main/chatGPT.gif" width="800" >
 
 ## Приложение для запуска чат-бота для Telegram на основе ChatGPT 
