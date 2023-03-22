@@ -9,3 +9,4 @@ exclude:
       - .gitignore
       - app.config.js
 failThreshold: 1
+bootstrap: npm install

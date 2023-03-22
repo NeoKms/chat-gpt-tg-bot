@@ -1,6 +1,6 @@
 const TelegramBot = require("node-telegram-bot-api");
 const {sleep, splitToChunks} = require("../helpers/helpers");
-const {BOT_TOKEN,TIMEOUT_MSG_EDIT} = require("../config");
+const {BOT_TOKEN, TIMEOUT_MSG_EDIT} = require("../config");
 
 module.exports = class BotAPIWrapper {
   bot = null;
@@ -11,10 +11,11 @@ module.exports = class BotAPIWrapper {
   }
 
   async setTyping(chatId) {
-    return this.bot.sendChatAction(chatId,"typing");
+    return this.bot.sendChatAction(chatId, "typing");
   }
+
   async cancelTyping(chatId) {
-    return this.bot.sendChatAction(chatId,"cancel");
+    return this.bot.sendChatAction(chatId, "cancel");
   }
 
   getBot() {
@@ -24,7 +25,7 @@ module.exports = class BotAPIWrapper {
   async sendMessage(chatId, text) {
     const chunks = splitToChunks(text, 4000);
     const res = {id: null, arr: []};
-    for (let i = 0; i<chunks.length; i++) {
+    for (let i = 0; i < chunks.length; i++) {
       const msg = await this.#sendMessage(chatId, chunks[i]);
       res.arr.push(msg);
       res.id = msg.id;
@@ -42,7 +43,8 @@ module.exports = class BotAPIWrapper {
         if (
           err?.response?.body?.description?.indexOf("Too Many Requests") !== -1
         ) {
-          return sleep(err.response.body.retry_after * 1000).then(() =>
+          const {retry_after} = err?.response?.body ?? {};
+          return sleep((retry_after ?? 1) * 1000).then(() =>
             this.sendMessage(chatId, text),
           );
         } else {
@@ -63,8 +65,9 @@ module.exports = class BotAPIWrapper {
           waitUnlim &&
                     err?.response?.body?.description?.indexOf("Too Many Requests") !== -1
         ) {
-          return sleep(err.response.body.retry_after * 1000).then(() =>
-            this.editMessageText(text, msgId, chatId),
+          const {retry_after} = err?.response?.body ?? {};
+          return sleep((retry_after ?? 1) * 1000).then(() =>
+            this.editMessageText(text , msgId, chatId),
           );
         } else {
           return {message: "error", error: err.message};

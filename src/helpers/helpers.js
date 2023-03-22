@@ -7,7 +7,7 @@ const helpers = {};
 helpers.formatDateJS = (t, m) => {
   if (!m) m = "YYYY-MM-DD hh:mm:ss";
   const d = new Date(t * 1000);
-  m = m.replace("YYYY", d.getUTCFullYear());
+  m = m.replace("YYYY", d.getUTCFullYear().toString());
   m = m.replace("YY", (d.getUTCFullYear() % 100 > 9 ? "" : "0") + d.getUTCFullYear() % 100);
   m = m.replace("MMMM", i18n.t[`months_arr.${d.getUTCMonth()}`]);
   m = m.replace("MM", ((d.getUTCMonth() + 1) > 9 ? "" : "0") + (d.getUTCMonth() + 1));
@@ -83,9 +83,8 @@ async function* streamAsyncIterable(stream) {
 const streamAsyncIterator = {
   [Symbol.asyncIterator]: streamAsyncIterable,
 };
-helpers.fetchSSE = async (input, options) => {
-  const {onMessage, onError, ...fetchOptions} = options;
-  const resp = await fetch(input, fetchOptions);
+helpers.fetchSSE = async (input, {onError,onMessage,options}) => {
+  const resp = await fetch(input, options);
   if (resp.status !== 200) {
     onError(await resp.json());
     return;
