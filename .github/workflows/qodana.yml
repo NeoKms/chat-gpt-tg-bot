@@ -23,7 +23,7 @@ jobs:
           QODANA_REVISION: ${{ github.sha }}
           QODANA_JOB_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         with:
-          args: --pr-mode,false
+          pr-mode: false
       - name: "GitHub code scanning"
         uses: github/codeql-action/upload-sarif@v2
         with:
