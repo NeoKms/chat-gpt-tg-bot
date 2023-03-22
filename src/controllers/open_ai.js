@@ -27,21 +27,23 @@ open_ai.sendReq = async function (text, data, db) {
   let isFirst = true;
   let msgSent = false;
   await fetchSSE("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${config.OPEN_AI_TOKEN}`,
+    options: {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${config.OPEN_AI_TOKEN}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        temperature: 0,
+        max_tokens: 2000,
+        top_p: 1,
+        frequency_penalty: 1,
+        presence_penalty: 1,
+        messages: messages,
+        stream: true,
+      }),
     },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      temperature: 0,
-      max_tokens: 2000,
-      top_p: 1,
-      frequency_penalty: 1,
-      presence_penalty: 1,
-      messages: messages,
-      stream: true,
-    }),
     onMessage: (msg) => {
       let resp;
       try {
