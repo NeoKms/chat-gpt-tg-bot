@@ -1,4 +1,6 @@
 [![Qodana](https://github.com/NeoKms/chat-gpt-tg-bot/actions/workflows/qodana.yml/badge.svg?branch=main)](https://github.com/NeoKms/chat-gpt-tg-bot/actions/workflows/qodana.yml)
+[![Dockerhub](https://github.com/NeoKms/chat-gpt-tg-bot/actions/workflows/build-and-push.yml/badge.svg?branch=main)](https://hub.docker.com/repository/docker/upachko/chat-gpt-tg-bot/general)
+[![Latest Stable Version](https://img.shields.io/github/v/release/neokms/chat-gpt-tg-bot)](https://github.com/NeoKms/chat-gpt-tg-bot/releases)
 <img src="https://raw.githubusercontent.com/NeoKms/my-static/main/chatGPT.gif" width="800" >
 
 ## Приложение для запуска чат-бота для Telegram на основе ChatGPT 
