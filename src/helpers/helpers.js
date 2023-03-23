@@ -83,7 +83,7 @@ async function* streamAsyncIterable(stream) {
 const streamAsyncIterator = {
   [Symbol.asyncIterator]: streamAsyncIterable,
 };
-helpers.fetchSSE = async (input, {onError,onMessage,options}) => {
+helpers.fetchSSE = async (input, {onError, onMessage, options}) => {
   const resp = await fetch(input, options);
   if (resp.status !== 200) {
     onError(await resp.json());

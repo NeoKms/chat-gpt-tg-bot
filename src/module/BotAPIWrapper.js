@@ -67,7 +67,7 @@ module.exports = class BotAPIWrapper {
         ) {
           const {retry_after} = err?.response?.body ?? {};
           return sleep((retry_after ?? 1) * 1000).then(() =>
-            this.editMessageText(text , msgId, chatId),
+            this.editMessageText(text, msgId, chatId),
           );
         } else {
           return {message: "error", error: err.message};

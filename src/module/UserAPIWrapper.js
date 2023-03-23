@@ -14,9 +14,9 @@ module.exports = class UserAPIWrapper extends API {
   }
 
   async cancelTyping(chatId) {
-    return this.call("messages.setTyping",{
+    return this.call("messages.setTyping", {
       action: {
-        _:"sendMessageCancelAction"
+        _: "sendMessageCancelAction"
       },
       peer: {
         _: "inputPeerUser",
@@ -24,8 +24,9 @@ module.exports = class UserAPIWrapper extends API {
       },
     });
   }
+
   async setTyping(chatId) {
-    return this.call("messages.setTyping",{
+    return this.call("messages.setTyping", {
       action: {
         _: "sendMessageTypingAction",
       },
@@ -39,13 +40,14 @@ module.exports = class UserAPIWrapper extends API {
   async sendMessage(chatId, text) {
     const chunks = splitToChunks(text, 4000);
     const res = {id: null, arr: []};
-    for (let i = 0; i<chunks.length; i++) {
+    for (let i = 0; i < chunks.length; i++) {
       const msg = await this.#sendMessage(chatId, chunks[i]);
       res.arr.push(msg);
       res.id = msg.id;
     }
     return res;
   }
+
   async #sendMessage(chatId, text) {
     return this.call("messages.sendMessage", {
       message: text,

@@ -8,7 +8,7 @@ const messages = {};
 const inProgress = new Set();
 
 messages.onMessage = async function (msg) {
-  if (!["UserAPIWrapper","BotAPIWrapper"].includes(this?.constructor?.name)) {
+  if (!["UserAPIWrapper", "BotAPIWrapper"].includes(this?.constructor?.name)) {
     throw new Error(i18n.t("errors.api_bind"));
   }
   msg = prepareMessage(msg);
@@ -24,17 +24,17 @@ messages.onMessage = async function (msg) {
   const isBotCommand = msg.message[0] === "/";
   if (!isBotCommand) {
     const data = {
-      allText: i18n.t("messages.start_ai",{time: TIMEOUT_MSG_EDIT/1000}),
+      allText: i18n.t("messages.start_ai", {time: TIMEOUT_MSG_EDIT / 1000}),
       messageId: 0,
       chatId: uid,
       chunk: 0
     };
-    const {messages,tokens} = await OpenAIController.getChatMessages(msg.message.trim(), db);
+    const {messages, tokens} = await OpenAIController.getChatMessages(msg.message.trim(), db);
     if (tokens.length >= MAX_MSG_TOKENS) {
       return this.sendMessage(uid, i18n.t("messages.tooManyReq"));
     }
     await OpenAIController.sendReq.bind(this)(messages, data)
-      .then(success=>{
+      .then(success => {
         if (success && db.getHistoryMode()) {
           db.addInHistory(
             {role: "user", content: msg.message},

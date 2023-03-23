@@ -29,6 +29,7 @@ module.exports = class DB {
     dbData.history[this.uid].shift();
     saveDB(dbData);
   }
+
   getHistory() {
     return dbData.history[this.uid] ?? [];
   }

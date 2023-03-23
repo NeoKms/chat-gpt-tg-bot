@@ -14,18 +14,23 @@ open_ai.getChatMessages = async (text, db) => {
     messages.push(...db.getHistory());
   }
   messages.push({role: "user", content: text});
-  const tokens = tokenizer(messages.reduce((text,msg)=>text+=msg.content,"")).length;
-  if (tokens>=config.MAX_MSG_TOKENS && db.getHistoryMode() && db.getHistory()?.length) {
+  const tokens = tokenizer(messages.reduce((text, msg) => {
+    text += msg.content;
+    return text;
+  }, "")).length;
+  if (tokens >= config.MAX_MSG_TOKENS && db.getHistoryMode() && db.getHistory()?.length) {
     db.delOneHistoryBlock();
-    return open_ai.getChatMessages(text,db);
+    return open_ai.getChatMessages(text, db);
   } else {
-    return {messages,tokens};
+    return {messages, tokens};
   }
 };
 open_ai.sendReq = async function (messages, data) {
-  await this.setTyping(data.chatId).catch(()=>{});
-  const typingInterval = setInterval(()=>this.setTyping(data.chatId).catch(()=>{}), 5000);
-  if (!["UserAPIWrapper","BotAPIWrapper"].includes(this?.constructor?.name)) {
+  await this.setTyping(data.chatId).catch(() => {
+  });
+  const typingInterval = setInterval(() => this.setTyping(data.chatId).catch(() => {
+  }), 5000);
+  if (!["UserAPIWrapper", "BotAPIWrapper"].includes(this?.constructor?.name)) {
     throw new Error(i18n.t("errors.api_bind"));
   }
   let isFirst = true;
@@ -128,7 +133,8 @@ open_ai.sendReq = async function (messages, data) {
     data.allText += `\n----\nError: ${errorText}\n----`;
   }
   clearInterval(typingInterval);
-  await this.cancelTyping(data.chatId).catch(()=>{});
+  await this.cancelTyping(data.chatId).catch(() => {
+  });
   data.allText = data.allText.replace(i18n.t("messages.end_ai"), "");
   return !errorText?.length;
 };
