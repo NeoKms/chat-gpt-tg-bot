@@ -28,4 +28,20 @@ config.TIMEOUT_MSG_EDIT = parseInt(env.TIMEOUT_MSG_EDIT ?? 10000);
 
 config.APP_LOCALE = env.APP_LOCALE ?? "ru";
 
+config.MAX_MSG_TOKENS = env.MAX_MSG_TOKENS ?? 3000;
+
+/* https://platform.openai.com/docs/api-reference/chat/create */
+config.MODEL_CONFIG = {
+  maximum_tokens: 4097,//MAX_MSG_TOKENS+answer
+  body: {}
+};
+config.MODEL_CONFIG.body = {
+  model: "gpt-3.5-turbo",
+  temperature: 0,
+  max_tokens: config.MODEL_CONFIG.maximum_tokens - config.MAX_MSG_TOKENS,//answer
+  top_p: 1,
+  frequency_penalty: 1,
+  presence_penalty: 1,
+};
+
 module.exports = config;
