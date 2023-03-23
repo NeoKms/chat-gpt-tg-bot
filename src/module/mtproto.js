@@ -13,6 +13,7 @@ class API {
       },
     });
   }
+
   signIn(code, phone_code_hash) {
     return this.call("auth.signIn", {
       phone_code: code,
@@ -20,6 +21,7 @@ class API {
       phone_code_hash,
     });
   }
+
   checkLogin() {
     return this.call("users.getFullUser", {
       id: {
@@ -36,7 +38,8 @@ class API {
         path: path.resolve(__dirname, "../../tgdata/1.json"),
       },
     });
-    this.checkLogin().catch(()=>{});
+    this.checkLogin().catch(() => {
+    });
   }
 
   async call(method, params, options = {}) {
@@ -45,7 +48,7 @@ class API {
       return result;
     } catch (error) {
       const waitUnlim = params.waitUnlim ?? true;
-      MTPROTO_LOG_ALL==="true" && console.log(`${method} error:`, error);
+      MTPROTO_LOG_ALL === "true" && console.log(`${method} error:`, error);
 
       const {error_code, error_message} = error;
 

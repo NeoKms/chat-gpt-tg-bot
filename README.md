@@ -1,6 +1,7 @@
 [![Qodana](https://github.com/NeoKms/chat-gpt-tg-bot/actions/workflows/qodana.yml/badge.svg?branch=main)](https://github.com/NeoKms/chat-gpt-tg-bot/actions/workflows/qodana.yml)
 [![Dockerhub](https://github.com/NeoKms/chat-gpt-tg-bot/actions/workflows/build-and-push.yml/badge.svg?branch=main)](https://hub.docker.com/repository/docker/upachko/chat-gpt-tg-bot/general)
 [![Latest Stable Version](https://img.shields.io/github/v/release/neokms/chat-gpt-tg-bot)](https://github.com/NeoKms/chat-gpt-tg-bot/releases)
+[![Supported languages](https://img.shields.io/badge/languages-RU%2CEN-green)](#locales)
 <img src="https://raw.githubusercontent.com/NeoKms/my-static/main/chatGPT.gif" width="800" >
 
 ## Приложение для запуска чат-бота для Telegram на основе ChatGPT 
@@ -27,7 +28,7 @@
 ## Возможности 
 Для получения помощи отправить ```/help```
 
-Для установки поведения отправить ```/system поведение``` или во время отправки сообщения ```поведение/system/текст сообщения``` (в данном случае история сообщений не сохраняется, чтобы не портить заданный контекст). Например, можно установить, чтобы он переводил текст: ```/system Ты помощник в переводе текста с русского на японский```
+Для установки поведения отправить ```/system поведение```. Например, можно установить, чтобы он переводил текст: ```/system Ты помощник в переводе текста с русского на японский```
 
 Для включения режима запоминания истории (режим "чата") ```/history```. В данном режиме бот будет запоминать все сообщения и отвечать учитывая предыдущие сообщения. Вызов команды отчищает сохраненную в базе историю сообщений.
 
@@ -36,6 +37,7 @@
 ## Дополнительные переменные окружения
 1. TIMEOUT_MSG_EDIT - Время между обновлением (изменением сообщения) ответа в реальном времени. Маленькие значения могут приводить ко временной блокировки по флуду.
 2. APP_LOCALE - Язык приложения. Доступны en и ru.
+3. MAX_MSG_TOKENS - Максимальное количество токенов отправляемое в модель (история сообщений + новое сообщение).
 
 ## Application for launching a chat bot for Telegram based on ChatGPT
 
@@ -61,7 +63,7 @@ Can work in two modes
 ## Possibilities
 For help send ```/help```
 
-To set the behavior, send ```/system behavior``` or while sending a message ```behavior/system/message text``` (in this case, the message history is not saved so as not to spoil the given context). For example, you can set it to translate text: ```/system You are an assistant in translating text from English to Japanese```
+To set the behavior, send ```/system behavior```. For example, you can set it to translate text: ```/system You are an assistant in translating text from English to Japanese```
 
 To enable the history memorization mode ("chat mode") ```/history```. In this mode, the bot will remember all messages and respond taking into account previous messages. Calling the command clears the history of messages stored in the database.
 
@@ -69,4 +71,5 @@ To force clear history ```/clear_history```
 
 ## Additional environment variables
 1. TIMEOUT_MSG_EDIT - The time between updating (changing a message) a response in real time. Small values can lead to a temporary flood block.
-2. APP_LOCALE - Application language. en and ru are available.
+2. <span id="locales">APP_LOCALE - Application language. en and ru are available.</span>
+3. MAX_MSG_TOKENS - The maximum number of tokens sent to the model (message history + new message).

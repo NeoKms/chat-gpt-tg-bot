@@ -12,6 +12,7 @@
   "author": "Zhigulskiy Vladislav",
   "license": "ISC",
   "dependencies": {
+    "@dqbd/tiktoken": "^1.0.2",
     "@mtproto/core": "^6.2.0",
     "eventsource-parser": "^0.1.0",
     "i18n": "^0.15.1",
