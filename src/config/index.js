@@ -32,11 +32,11 @@ config.MAX_MSG_TOKENS = env.MAX_MSG_TOKENS ?? 3000;
 
 /* https://platform.openai.com/docs/api-reference/chat/create */
 config.MODEL_CONFIG = {
-  maximum_tokens: 4097,//MAX_MSG_TOKENS+answer
+  maximum_tokens: 8192,//MAX_MSG_TOKENS+answer
   body: {}
 };
 config.MODEL_CONFIG.body = {
-  model: "gpt-3.5-turbo",
+  model: "gpt-4",
   temperature: 0,
   max_tokens: config.MODEL_CONFIG.maximum_tokens - config.MAX_MSG_TOKENS,//answer
   top_p: 1,
