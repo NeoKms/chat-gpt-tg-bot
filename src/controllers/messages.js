@@ -49,15 +49,15 @@ messages.onMessage = async function (msg) {
     const text = msg.message.replace(command, "").trim();
     if (command === "/system") {
       db.setSystem(text);
-      this.sendMessage(uid, i18n.t("messages.system_set"));
+      await this.sendMessage(uid, i18n.t("messages.system_set"));
     } else if (command === "/help") {
-      this.sendMessage(uid, i18n.t("messages.help"));
+      await this.sendMessage(uid, i18n.t("messages.help"));
     } else if (command === "/history") {
       db.switchHistoryMode();
-      this.sendMessage(uid, `${i18n.t("messages.history")} ${db.getHistoryMode() ? i18n.t("on") : i18n.t("off")}`);
+      await this.sendMessage(uid, `${i18n.t("messages.history")} ${db.getHistoryMode() ? i18n.t("on") : i18n.t("off")}`);
     } else if (command === "/clear_history") {
       db.clearHistory();
-      this.sendMessage(uid, i18n.t("messages.history_clear"));
+      await this.sendMessage(uid, i18n.t("messages.history_clear"));
     }
     inProgress.delete(uid);
   }
