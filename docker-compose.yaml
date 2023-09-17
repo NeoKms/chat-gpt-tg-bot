@@ -10,6 +10,7 @@ services:
       - TIMEOUT_MSG_EDIT=10000
       - MAX_MSG_TOKENS=3000
       - OPEN_AI_TOKEN=
+      - MODEL_VERSION=3
       # for bot
       - BOT_TOKEN=
       # for user
