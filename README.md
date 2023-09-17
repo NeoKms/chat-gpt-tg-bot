@@ -73,3 +73,4 @@ To force clear history ```/clear_history```
 1. TIMEOUT_MSG_EDIT - The time between updating (changing a message) a response in real time. Small values can lead to a temporary flood block.
 2. <span id="locales">APP_LOCALE - Application language. en and ru are available.</span>
 3. MAX_MSG_TOKENS - The maximum number of tokens sent to the model (message history + new message).
+4. MODEL_VERSION - You can switch the model version. Models 3 (3.5-turbo) and 4 versions are available.
