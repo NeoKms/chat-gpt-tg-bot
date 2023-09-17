@@ -1,4 +1,3 @@
-[![Qodana](https://github.com/NeoKms/chat-gpt-tg-bot/actions/workflows/qodana.yml/badge.svg?branch=main)](https://github.com/NeoKms/chat-gpt-tg-bot/actions/workflows/qodana.yml)
 [![Dockerhub](https://github.com/NeoKms/chat-gpt-tg-bot/actions/workflows/build-and-push.yml/badge.svg?branch=main)](https://hub.docker.com/repository/docker/upachko/chat-gpt-tg-bot/general)
 [![Latest Stable Version](https://img.shields.io/github/v/release/neokms/chat-gpt-tg-bot)](https://github.com/NeoKms/chat-gpt-tg-bot/releases)
 [![Supported languages](https://img.shields.io/badge/languages-RU%2CEN-green)](#locales)
