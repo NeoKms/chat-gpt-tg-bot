@@ -1,4 +1,4 @@
-FROM node:18.12.1
+FROM node:18
 
 RUN apt update && apt install nano mc -y
 
